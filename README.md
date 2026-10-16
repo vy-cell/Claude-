@@ -1,4 +1,6 @@
-# Summerfield training-video agent
+# Summerfield Studio
+
+The Summerfield training-video agent.
 
 Raw kitchen footage in → finished, on-brand training videos out, in **English, Vietnamese and
 Spanish**, plus the **2-page SOP recipe card** with real step photos — edited the same
@@ -112,10 +114,16 @@ voice, languages) and `brand/style_guide.md` (rules the AI follows).
   clearly for a couple of seconds. The agent picks the clips, zooms and pointer spots itself.
 - Film the common mistakes too, so it can build the Right vs Wrong cards from real shots.
 
-## Using it from Claude Code
+## Using Summerfield Studio from Claude Code
 
-`.claude/agents/video-editor.md` defines a `video-editor` subagent, so you can say *"make the
-training video from raw/boba_prep.mp4 with these notes"* and it runs the whole pipeline.
+Open this repository in Claude Code and ask by name:
+
+- *"Summerfield Studio, make the training video from raw/boba_prep.mp4 with these notes"*
+- *"Summerfield Studio, update the card: approved by Jamie Tran, Kitchen Manager"*
+- *"Summerfield Studio, edit this card: step 3 now stops at 2.45 lb"*
+
+The agent is defined in `.claude/agents/summerfield-studio.md`; you can also pick
+`summerfield-studio` from the `/agents` list.
 
 ## Development
 
