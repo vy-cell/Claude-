@@ -28,6 +28,18 @@ class Colors(BaseModel):
     accent_light: str = "#D2B196"  # note pills
     danger: str = "#AA4E40"  # "never" callouts, WRONG frames
     surface: str = "#FFFFFF"
+    # SOP card: step-number badge colour per phase of the task (cycled)
+    phase_a: str = "#56714F"  # deep sage
+    phase_b: str = "#94683E"  # caramel brown
+    phase_c: str = "#3F6870"  # slate teal
+    phase_d: str = "#8B5B2D"  # brown
+    tone_green: str = "#6E8C64"  # timeline dots / kickers
+    tone_caramel: str = "#CDA077"
+    tone_caramel_text: str = "#8B5B2D"
+    tone_blue: str = "#7FA3A9"
+    tone_blue_text: str = "#5F8189"
+    never_ring: str = "#D9A497"
+    chip_bg: str = "#F0F2EF"
 
 
 class Fonts(BaseModel):
@@ -35,6 +47,7 @@ class Fonts(BaseModel):
     body: str = "fonts/WorkSans-VF.ttf"  # Work Sans - labels, captions, callouts
     heading_fallback: str = "fonts/NotoSerif-VF.ttf"  # used when a language needs glyphs the heading font lacks
     body_fallback: str = "fonts/WorkSans-VF.ttf"
+    accent: str = "fonts/Yellowtail-Regular.ttf"  # script accents on the SOP card (stand-in for Cote Lumiere)
 
 
 class Assets(BaseModel):
@@ -42,6 +55,17 @@ class Assets(BaseModel):
     logo_mark: str = "assets/logomark-dark.png"
     logo_mark_light: str = "assets/logomark-white.png"
     mascot: str | None = "assets/mascot.png"
+
+
+class CardInfo(BaseModel):
+    """Fill-in fields printed on the SOP card footer / QR. Defaults here, override per run."""
+
+    version: str = "1.0"
+    effective: str = ""  # empty -> today's date
+    approved_by: str = ""
+    approver_title: str = ""
+    video_url: str = ""  # QR code target; "{lang}" is replaced with the language code
+    date_format: str = "%m/%d/%Y"
 
 
 class Template(BaseModel):
@@ -112,6 +136,7 @@ class Brand(BaseModel):
     fonts: Fonts = Field(default_factory=Fonts)
     assets: Assets = Field(default_factory=Assets)
     template: Template = Field(default_factory=Template)
+    card_info: CardInfo = Field(default_factory=CardInfo)
     timing: Timing = Field(default_factory=Timing)
     voiceover: Voiceover = Field(default_factory=Voiceover)
     audio: Audio = Field(default_factory=Audio)

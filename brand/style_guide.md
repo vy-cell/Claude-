@@ -88,3 +88,25 @@ subheading with a green bar, content in white rounded panels with soft shadows.
 **Pacing.** Each scene carries one idea, about 3-8 s. Footage clips show exactly what is
 being said. Whole video under 6 minutes - shorter whenever nothing essential is lost.
 <!-- sample:end -->
+
+<!-- card:start -->
+## SOP recipe card (2 pages, US Letter portrait)
+
+Made automatically after every video (`make`), from the final video plan. Matches the approved
+card format (store it with `learn-card approved.pdf` so the reviewer compares against it).
+
+- **Front.** Sage header: small stacked logo, script kicker ("how to make"), Caudex title,
+  letter-spaced phase flow with caramel arrows, white-framed hero photo of the result; dashed
+  sage stripe. Batch strip (green "One batch" cell + up to 3 quantities), TOOLS line, steps 1-6
+  in two columns (photo, coloured number badge per phase, Caudex step title, 1-3 short
+  sentences with the critical words in bold, green tick line with the success check), "Before
+  you start" hygiene line, "Turn over" note, "Watch it" QR box.
+- **Back.** Header with logomark, short title and script "almost done"; work-in-batches chip
+  flow (last chip dark); remaining steps (max 4); storage timeline (green prep/ready, caramel
+  use-by, blue freeze/thaw); "Never" row of round photos with pink rings or a line icon; footer
+  with company · Confidential · SOP version · effective date · approver.
+- **Photos** are frames from the finished video (they already show insets, callouts and
+  arrows on the measurement), cropped clean of the caption pill, step strip and badge.
+- **Text density** like the reference: short, beginner-proof, every number exactly as in the video.
+<!-- card:end -->
+

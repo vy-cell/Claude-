@@ -1,7 +1,7 @@
 # Summerfield training-video agent
 
 Raw kitchen footage in → finished, on-brand training videos out, in **English, Vietnamese and
-Spanish**, plus a **one-page step-by-step instruction card** with real photos — edited the same
+Spanish**, plus the **2-page SOP recipe card** with real step photos — edited the same
 way every time, with no manual editing.
 
 ```
@@ -37,18 +37,19 @@ python -m tutorial_editor make raw_footage.mp4 --notes popcorn_chicken_notes.md
    are translated; the cuts and timing structure stay identical. Brand terms are never
    translated, and Caudex falls back to Noto Serif for Vietnamese letters it lacks. Each
    language gets its own director pass.
-6. **Instruction card** — one printable page (Letter landscape, PNG + PDF) in every language:
-   - every step with a real, clean, mid-action photo cropped to the action
-   - rings and arrows pointing at the exact measurement (scale readout, fill line, label spot)
-   - short instructions, the key number with an icon, and the one mistake to avoid
-   - food-safety and storage rules in the footer
-   - reviewed and revised until ready
+6. **SOP recipe card** — made automatically once the video is finished, in the approved
+   2-page format (front: title, batch, tools, steps 1–6, QR to the video; back: batch flow,
+   remaining steps, storage timeline, "Never" row, footer). Step photos are frames from the
+   finished video, so they already show the zoom insets and arrows on the measurement. Claude
+   writes it from the final video plan, a reviewer checks the printed pages against the
+   approved card (overflow is measured, not guessed) and it is revised until ready, then
+   translated. PDF + page PNGs per language.
 
 ## Outputs
 
 ```
 out/<video>/
-  en/<video>_en.mp4  <video>_en.srt  <video>_card_en.pdf/.png  plan_en.json  card_en.json
+  en/<video>_en.mp4  <video>_en.srt  <video>_card_en.pdf (+ page PNGs)  plan_en.json  card_en.json
   vi/...             es/...
   review_log.md      # what the director found and changed, round by round
   outputs.json
@@ -57,7 +58,7 @@ out/<video>/
 ## Setup
 
 ```bash
-pip install -r requirements.txt          # plus ffmpeg and poppler-utils
+pip install -r requirements.txt          # plus ffmpeg, poppler-utils and Chromium/Chrome (set CHROME_PATH if not on PATH)
 export ANTHROPIC_API_KEY=...             # Claude
 export ELEVENLABS_API_KEY=...            # voiceover; set voiceover.voice_id in brand/brand.yaml
 python tools/extract_brand_assets.py --guideline 2026_Brand_Guideline.pdf --sample Approved_Training.mp4
@@ -68,6 +69,29 @@ machine. **This repository is public**, so brand assets, footage, guideline PDFs
 frames are git-ignored and never committed.
 
 Try an edit without paying for voiceover: add `--voice preview` (silent, correctly timed).
+
+## SOP card: fill-in fields and edits
+
+The footer and QR code come from fields you fill in. Defaults live in `brand/brand.yaml`
+(`card_info`); override them on any run:
+
+```
+python -m tutorial_editor make raw.mp4 --notes notes.md \
+    --approved-by "Karina Fong" --approver-title "R&D Specialist" --version 1.0 \
+    --effective 10/16/2026 --video-url "https://…/popcorn-chicken-{lang}"
+```
+
+| You want to | Run |
+|---|---|
+| Fill in / change the fields after the video is done (no re-render) | `python -m tutorial_editor card out/<video> --approved-by "…" --effective 11/01/2026` |
+| Change only the fields on an existing card PDF (no AI) | `python -m tutorial_editor edit-card card.pdf --approved-by "…" --version 1.1` |
+| Change the content of a card | `python -m tutorial_editor edit-card card.pdf --request "Step 3: stop at 2.45 lb; add 'stir every 30 sec'" --languages vi,es` |
+| Set the card format to match | `python -m tutorial_editor learn-card approved_card.pdf` |
+
+Every card PDF made here carries its own editable source (text, photos, fields), so edits are
+exact. A card made elsewhere (e.g. your current SOP PDF) can also be uploaded: Claude reads it,
+reuses its photos and rebuilds it in the template. Content edits bump the version (1.0 → 1.1)
+and set the effective date to today unless you pass them.
 
 ## Keeping every video consistent
 
@@ -99,5 +123,6 @@ training video from raw/boba_prep.mp4 with these notes"* and it runs the whole p
 python -m pytest -q      # renders a synthetic video end to end; Claude is mocked
 ```
 
-Fonts: Caudex, Work Sans and Noto Serif (SIL Open Font License, see `brand/fonts/OFL-*.txt`).
-Côte Lumière is commercial and not included; the template doesn't require it.
+Fonts: Caudex, Work Sans and Noto Serif (SIL Open Font License, `brand/fonts/OFL-*.txt`) and
+Yellowtail (Apache 2.0) as the script accent on the card. Côte Lumière is commercial and not
+included - drop its file in `brand/fonts/` and point `fonts.accent` at it to use it.

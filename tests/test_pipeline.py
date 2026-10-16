@@ -5,7 +5,7 @@ from tests.fixtures.make_card import card
 from tests.fixtures.make_plan import plan
 from tutorial_editor import card as card_mod
 from tutorial_editor import planner
-from tutorial_editor.card import CardReview
+from tutorial_editor.card import CardReview, SOPCard
 from tutorial_editor.models import VideoPlan
 from tutorial_editor.pipeline import Options, make
 from tutorial_editor.planner import Issue, Review
@@ -35,7 +35,7 @@ def test_make_runs_review_rounds_translates_and_builds_card(brand, raw_video, tm
                               issues=[Issue(scene=1, severity="medium", problem="caption long", fix="shorten")])
             p.scenes[1].caption = "3 steps"
             return Review(score=95, ready_to_ship=True, issues=[], plan=p)
-        if schema is card_mod.CardPlan:
+        if schema is SOPCard:
             return card()
         if schema is CardReview:
             return CardReview(score=95, ready_to_ship=True, issues=[], card=card())
@@ -56,3 +56,5 @@ def test_make_runs_review_rounds_translates_and_builds_card(brand, raw_video, tm
     assert es["scenes"][2]["clip_start"] == small.scenes[2].clip_start
     log = (tmp_path / "raw" / "review_log.md").read_text()
     assert "score **70**" in log and "shipped" in log
+    meta = json.loads((tmp_path / "raw" / "render_meta.json").read_text())
+    assert len(meta["scene_times"]) == len(small.scenes)

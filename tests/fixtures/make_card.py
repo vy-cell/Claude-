@@ -1,14 +1,26 @@
-from tutorial_editor.card import CardPlan, CardStep, Crop, Fact, Mark
+"""Generic SOP card for the 20 s synthetic test video (photos come from raw-footage seconds)."""
+from tutorial_editor.card import (BatchItem, CardStep, CardUi, Crop, NeverItem, PhotoRef, SOPCard, TimelineNode)
 
 
-def card() -> CardPlan:
-    icons = ["drop", "scale", "clock", "cup", "tag", "thermometer"]
-    return CardPlan(
-        title="Iced Tea Batch", subtitle="Back of house · quick reference",
-        key_facts=[Fact(label="Batch", value="2 gallons"), Fact(label="Tea", value="4 oz · 113 g")],
-        steps=[CardStep(title=f"Step {i + 1}", photo_time=1 + i * 3, photo_crop=Crop(x=0.2, y=0.2, w=0.5, h=0.6),
-                        marks=[Mark(kind=["ring", "arrow", "box"][i % 3], x=0.45, y=0.5, w=0.1, h=0.1, label="fill line")] if i % 2 == 0 else [],
-                        instructions=["Do the first thing", "Then the second thing"], key_value="5 min" if i % 2 else "",
-                        icon=icons[i], warning="Never skip this" if i % 3 == 0 else "") for i in range(6)],
-        rules=[Fact(label="Wash", value="Hands 20 sec, then gloves"), Fact(label="Store", value="≤ 41°F (5°C), use within 24 hrs")],
-        footer_note="Questions? Ask your shift lead.")
+def ref(t: float) -> PhotoRef:
+    return PhotoRef(file="", scene=-1, time=t, crop=Crop(x=0.1, y=0.1, w=0.7, h=0.75))
+
+
+def card() -> SOPCard:
+    return SOPCard(
+        kicker="how to make", title="Iced Tea Batch", short_title="Iced Tea", flow=["Steep", "Chill", "Store"], hero=ref(1),
+        batch_label="One batch", batch=[BatchItem(value="2 gal", detail="finished tea"), BatchItem(value="4 oz", detail="tea leaves (113 g)")],
+        tools=["Large pitcher", "Timer", "Strainer"],
+        steps=[CardStep(title=f"Step {i + 1}", body="Do the **first thing**, then the second thing.", check="Looks right",
+                        phase=min(i // 3, 2), photo=ref(1 + i * 2)) for i in range(8)],
+        before_you_start=["wash hands for 20 sec", "sanitize the station"],
+        batch_flow_label="Work in batches", batch_flow=["Steep all", "Chill all", "Label"], back_kicker="almost done",
+        timeline_title="Ready in 2 hours", timeline_note="chill before serving",
+        timeline=[TimelineNode(kicker="Day 0", title="Brew", detail="steep 5 min", tone="green"),
+                  TimelineNode(kicker="+2 hrs", title="Ready", detail="fully chilled", tone="green"),
+                  TimelineNode(kicker="Day 1", title="Use by", detail="end of day", tone="caramel")],
+        never_title="Never", never=[NeverItem(title="Over-steep", detail="set a timer", photo=ref(12), icon="none"),
+                                    NeverItem(title="Leave it out", detail="keep it cold", photo=ref(-1), icon="thermometer")],
+        ui=CardUi(tools="Tools", before_you_start="Before you start:", turn_over="Turn over for steps {first}–{last} →",
+                  watch_title="Watch it", watch_note="scan for the training video", confidential="Confidential", sop="SOP",
+                  effective="Effective", approved_by="Approved by"))

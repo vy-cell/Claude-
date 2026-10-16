@@ -26,12 +26,25 @@ colors:
   accent_light: "#D2B196"   # note pills
   danger: "#AA4E40"         # NEVER callouts, WRONG frames
   surface: "#FFFFFF"
+  # SOP card
+  phase_a: "#56714F"        # step badges, cycled per phase of the task
+  phase_b: "#94683E"
+  phase_c: "#3F6870"
+  phase_d: "#8B5B2D"
+  tone_green: "#6E8C64"     # storage timeline
+  tone_caramel: "#CDA077"
+  tone_caramel_text: "#8B5B2D"
+  tone_blue: "#7FA3A9"
+  tone_blue_text: "#5F8189"
+  never_ring: "#D9A497"     # "Never" photo rings
+  chip_bg: "#F0F2EF"
 
 fonts:
   heading: "fonts/Caudex-Regular.ttf"        # Caudex - primary font (titles, headlines)
   body: "fonts/WorkSans-VF.ttf"              # Work Sans - secondary font (labels, captions, callouts)
   heading_fallback: "fonts/NotoSerif-VF.ttf" # for Vietnamese letters Caudex does not include
   body_fallback: "fonts/WorkSans-VF.ttf"
+  accent: "fonts/Yellowtail-Regular.ttf"     # script accent on the SOP card ("how to make")
   # Cote Lumiere (complementary, short accents only) is a commercial font - drop the file in
   # brand/fonts/ if you want it; the template does not need it.
 
@@ -40,6 +53,14 @@ assets:              # rebuild locally with tools/extract_brand_assets.py (not c
   logo_mark: "assets/logomark-dark.png"
   logo_mark_light: "assets/logomark-white.png"
   mascot: "assets/mascot.png"
+
+card_info:           # printed on the SOP card - override per run with --version/--effective/--approved-by ...
+  version: "1.0"
+  effective: ""                 # blank = today
+  approved_by: ""               # e.g. "Karina Fong"
+  approver_title: ""            # e.g. "R&D Specialist"
+  video_url: ""                 # QR code link; {lang} becomes en / vi / es
+  date_format: "%m/%d/%Y"
 
 template:
   series_label: "BACK OF HOUSE TRAINING"

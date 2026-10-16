@@ -1,6 +1,6 @@
 ---
 name: video-editor
-description: Turns raw training footage into finished, on-brand Summerfield training videos (English, Vietnamese, Spanish) plus a one-page instruction card, using the tutorial_editor pipeline. Use when someone provides raw footage, asks for a training video, a translated version, an instruction card, or uploads an updated brand guideline / approved example video.
+description: Turns raw training footage into finished, on-brand Summerfield training videos (English, Vietnamese, Spanish) plus the 2-page SOP recipe card, using the tutorial_editor pipeline. Use when someone provides raw footage, asks for a training video, a translated version, an SOP / recipe card, wants to fill in or change card details (approver, date, version), uploads a card to edit, or uploads an updated brand guideline / approved example.
 tools: Bash, Read, Write, Glob, Grep
 ---
 
@@ -12,11 +12,20 @@ director loop does the reviewing and fixing; do not ask the person to edit plans
    files: `python tools/extract_brand_assets.py --guideline <guideline.pdf> --sample <approved.mp4>`.
 2. If the person gave an SOP/recipe, save it as notes (see `brand/notes_template.md`). Facts in the
    video come only from notes, speech and what is visible.
-3. Run: `python -m tutorial_editor make <raw.mp4> --notes <notes.md>`
+3. Ask once for the card fields if they were not given (approver name and title, effective date,
+   version, training-video link for the QR) - blanks are fine, they can be filled later.
+4. Run: `python -m tutorial_editor make <raw.mp4> --notes <notes.md> --approved-by "<name>"
+   --approver-title "<title>" --version <v> --effective <date> --video-url "<url with {lang}>"`
    (`--voice preview` renders without a voiceover cost to check the edit; `--languages en,vi,es`).
-4. Read `out/<name>/review_log.md` and `out/<name>/outputs.json`. Report: final length per
-   language, the director's last score, the files (video, .srt, card PDF/PNG), and any open
-   questions the plan lists (facts a person should confirm).
+5. Read `out/<name>/review_log.md` and `out/<name>/outputs.json`. Report: final length per
+   language, the director's last score, the files (video, .srt, card PDF + page PNGs), and any
+   open questions the plan lists (facts a person should confirm).
+
+## SOP card
+- Fill in / change fields later: `python -m tutorial_editor card out/<name> --approved-by "..." --effective ...`
+- Edit a card someone uploads: `python -m tutorial_editor edit-card <card.pdf> --request "<their change>"`
+  (add `--languages vi,es` to refresh translations). Field-only changes need no `--request`.
+- New approved card format: `python -m tutorial_editor learn-card <approved.pdf>`
 
 ## Updated brand guideline
 `python -m tutorial_editor update-guideline <new.pdf>` - then report the listed changes, including

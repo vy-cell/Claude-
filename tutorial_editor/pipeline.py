@@ -13,13 +13,13 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from .brand import Brand
-from .card import CardPlan, make_card, render_card, review_card, translate_card
+from .brand import Brand, CardInfo
+from .cardflow import CardJob, build_cards
 from .guideline import reference_frames
 from .media import duration, load_or_transcribe, sample_frames, still, transcript_lines, video_size
 from .models import VideoPlan
 from .planner import make_plan, merge_text, plan_to_json, review, translate
-from .render import Renderer, RenderResult, SceneTiming
+from .render import XFADE, Renderer, RenderResult, SceneTiming
 
 
 @dataclass
@@ -34,6 +34,7 @@ class Options:
     notes: str = ""
     plan_file: Path | None = None
     whisper_model: str = "small"
+    card_info: CardInfo | None = None  # fill-in fields for the SOP card; None = brand.yaml defaults
 
 
 @dataclass
@@ -83,13 +84,11 @@ def make(raw: Path, brand: Brand, out_root: Path, opt: Options) -> dict:
     (lang_dir / f"plan_{src_lang}.json").write_text(plan_to_json(plan))
     outputs = {src_lang: {"video": str(result.video), "srt": str(result.srt), "seconds": round(result.duration, 1)}}
 
-    # ---------------------------------------------------------- 3. instruction card
-    card = None
-    if opt.make_card:
-        card = build_card(brand, renderer, plan, frames, refs, opt, log, lang_dir, stem, src_lang)
-        outputs[src_lang]["card"] = str(lang_dir / f"{stem}_card_{src_lang}.pdf")
+    (out / "render_meta.json").write_text(json.dumps({
+        "stem": stem, "raw": str(raw.resolve()), "video": str(result.video), "languages": opt.languages,
+        "scene_times": scene_times(result)}, indent=2))
 
-    # ---------------------------------------------------------- 4. translations
+    # ---------------------------------------------------------- 3. translations
     for code in opt.languages:
         if code == src_lang:
             continue
@@ -102,21 +101,15 @@ def make(raw: Path, brand: Brand, out_root: Path, opt: Options) -> dict:
                               text_only=True)
         (d / f"plan_{code}.json").write_text(plan_to_json(tplan))
         outputs[code] = {"video": str(tres.video), "srt": str(tres.srt), "seconds": round(tres.duration, 1)}
-        if card is not None:
-            tcard = translate_card(brand, card, lang.name, opt.max_seconds)
-            png, pdf, warns = render_card(brand, tcard, renderer.stills, d / f"{stem}_card_{code}.png")
-            for _ in range(opt.translation_rounds):
-                rv = review_card(brand, tplan, tcard, png, warns, frames, refs, opt.max_seconds, text_only=True)
-                log(f"{lang.name} card review: score {rv.score}, ready={rv.ready_to_ship}\n" + _bullets(rv.issues))
-                if rv.ready_to_ship and not warns:
-                    break
-                if len(rv.card.steps) == len(tcard.steps):
-                    for a, b in zip(rv.card.steps, tcard.steps):
-                        a.photo_time = b.photo_time
-                tcard = rv.card
-                png, pdf, warns = render_card(brand, tcard, renderer.stills, d / f"{stem}_card_{code}.png")
-            (d / f"card_{code}.json").write_text(tcard.model_dump_json(indent=2))
-            outputs[code]["card"] = str(pdf)
+
+    # ---------------------------------------------------------- 4. SOP card (after the video is done)
+    if opt.make_card:
+        job = CardJob(brand=brand, out=out, stem=stem, plan_json=plan_to_json(plan), raw=raw, final_video=result.video,
+                      scene_times=scene_times(result), raw_frames=frames, info=opt.card_info or brand.card_info,
+                      languages=opt.languages, rounds=opt.card_rounds, translation_rounds=min(opt.translation_rounds, 1),
+                      target_score=opt.target_score)
+        for code, pdf in build_cards(job, log).items():
+            outputs.setdefault(code, {})["card"] = pdf
 
     (out / "outputs.json").write_text(json.dumps(outputs, indent=2, ensure_ascii=False))
     log("## Done\n```json\n" + json.dumps(outputs, indent=2, ensure_ascii=False) + "\n```")
@@ -180,19 +173,13 @@ def improve(brand: Brand, renderer: Renderer, plan: VideoPlan, lang: str, video:
     return plan, result
 
 
-def build_card(brand, renderer, plan, frames, refs, opt, log, d: Path, stem: str, lang: str) -> CardPlan:
-    log("## Instruction card\nWriting the one-page card ...")
-    card = make_card(brand, plan, frames, opt.max_seconds)
-    png, pdf, warns = render_card(brand, card, renderer.stills, d / f"{stem}_card_{lang}.png")
-    for r in range(1, opt.card_rounds + 1):
-        rv = review_card(brand, plan, card, png, warns, frames, refs, opt.max_seconds)
-        log(f"card round {r}: score **{rv.score}**/100, ready={rv.ready_to_ship}\n" + _bullets(rv.issues))
-        if rv.ready_to_ship and rv.score >= opt.target_score and not warns:
-            break
-        card = rv.card
-        png, pdf, warns = render_card(brand, card, renderer.stills, d / f"{stem}_card_{lang}.png")
-    (d / f"card_{lang}.json").write_text(card.model_dump_json(indent=2))
-    return card
+def scene_times(result: RenderResult) -> list[float]:
+    """Time in the finished video where each scene has fully animated in (for card photos)."""
+    out, t = [], 0.0
+    for tm in result.timings:
+        out.append(round(t + max(0.0, min(tm.duration - 0.3, 2.6)), 3))
+        t += tm.duration - XFADE
+    return out
 
 
 # ---------------------------------------------------------------- helpers

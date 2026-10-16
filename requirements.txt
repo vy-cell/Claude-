@@ -3,6 +3,8 @@ pydantic>=2.6
 PyYAML>=6
 Pillow>=10.4
 fonttools>=4.50
+segno>=1.6           # QR code on the SOP card
+pypdf>=5            # embeds the editable card source in the PDF
 faster-whisper>=1.0   # optional: speech transcript of the raw footage (planning still works without it)
 pytest>=8             # tests only
-# system tools: ffmpeg/ffprobe (with libx264), poppler-utils (pdftoppm, pdftotext)
+# system tools: ffmpeg/ffprobe (with libx264), poppler-utils (pdftoppm, pdftotext, pdfimages), Chromium/Chrome
