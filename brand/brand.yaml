@@ -1,0 +1,81 @@
+# Summerfield Tea Bar - brand kit for the training-video agent.
+# Colours/fonts are kept in sync with the official guideline by:
+#   python -m tutorial_editor update-guideline <guideline.pdf>
+# (previous versions are saved in brand/history/).
+
+name: "Summerfield Tea Bar"
+voice_and_tone: "Warm, elevated, inviting and calm. Clear, simple and encouraging for a brand-new team member. Never overly promotional."
+glossary:            # never translated, always spelled exactly like this
+  - "Summerfield"
+  - "Summerfield Tea Bar"
+banned_words: []
+style_guide: "style_guide.md"
+
+colors:
+  card_bg: "#E3E8E3"        # PANTONE 9042 C - slide / card background
+  panel_bg: "#D5E1CF"       # title-card photo panel
+  text: "#231F20"           # PANTONE Black 7 C
+  muted_text: "#80867B"
+  primary: "#5E7A56"        # deep sage - step badges, "do" callouts, active progress pill
+  primary_light: "#8E9F87"  # info callouts
+  stripe_a: "#B6CFAE"       # PANTONE 2260 C - striped band
+  stripe_b: "#DBE3D7"
+  caption_bg: "#93817E"     # caption pill
+  badge_bg: "#A39693"       # CONFIDENTIAL MATERIAL badge
+  accent: "#CDA077"         # PANTONE 728 C - arrows / pointers
+  accent_light: "#D2B196"   # note pills
+  danger: "#AA4E40"         # NEVER callouts, WRONG frames
+  surface: "#FFFFFF"
+
+fonts:
+  heading: "fonts/Caudex-Regular.ttf"        # Caudex - primary font (titles, headlines)
+  body: "fonts/WorkSans-VF.ttf"              # Work Sans - secondary font (labels, captions, callouts)
+  heading_fallback: "fonts/NotoSerif-VF.ttf" # for Vietnamese letters Caudex does not include
+  body_fallback: "fonts/WorkSans-VF.ttf"
+  # Cote Lumiere (complementary, short accents only) is a commercial font - drop the file in
+  # brand/fonts/ if you want it; the template does not need it.
+
+assets:              # rebuild locally with tools/extract_brand_assets.py (not committed)
+  logo_horizontal: "assets/logo-horizontal-dark.png"
+  logo_mark: "assets/logomark-dark.png"
+  logo_mark_light: "assets/logomark-white.png"
+  mascot: "assets/mascot.png"
+
+template:
+  series_label: "BACK OF HOUSE TRAINING"
+  badge_text: "CONFIDENTIAL MATERIAL"   # "" hides it
+  closing_word: "YAY"
+  caption_max_chars: 60
+  callout_max: 3
+
+timing:
+  lead_in: 0.35
+  tail: 0.45
+  min_scene: 2.5
+  min_card: 3.5
+  footage_speed_range: [0.8, 2.0]
+
+voiceover:
+  provider: "elevenlabs"          # elevenlabs | command | preview (silent, for checking the edit)
+  voice_id: ""                    # pick one voice and keep it forever = consistent videos
+  model_id: "eleven_multilingual_v2"   # speaks English, Vietnamese and Spanish with the same voice
+  stability: 0.55
+  similarity_boost: 0.75
+  speed: 1.0
+  keep_source_audio: false
+  source_audio_db: -24
+
+audio:
+  target_lufs: -16
+  true_peak: -1.5
+
+output:
+  width: 1920
+  height: 1080
+  fps: 30
+  crf: 18
+  source_language: "en"
+  languages:
+    - {code: "en", name: "English"}
+    - {code: "vi", name: "Vietnamese"}
+    - {code: "es", name: "Spanish"}
