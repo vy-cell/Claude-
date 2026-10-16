@@ -87,7 +87,11 @@ def main() -> None:
     ap.add_argument("--sample", type=Path)
     ap.add_argument("--mascot-time", type=float, default=2.0)
     ap.add_argument("--mascot-box", default="790,580,1150,995")
+    ap.add_argument("--out", type=Path, help="assets folder (default: brand/assets in this repo)")
     a = ap.parse_args()
+    global ASSETS
+    if a.out:
+        ASSETS = a.out
     ASSETS.mkdir(parents=True, exist_ok=True)
     logos(a.guideline)
     if a.sample:

@@ -1,0 +1,10 @@
+.git
+data
+out
+work
+**/__pycache__
+.pytest_cache
+*.mp4
+*.mov
+*.pdf
+.env

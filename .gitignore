@@ -3,6 +3,8 @@ __pycache__/
 .pytest_cache/
 out/
 work/
+data/
+.env
 
 # Private brand material - never commit (this repo is public).
 # Rebuild locally: python tools/extract_brand_assets.py --guideline <pdf> --sample <mp4>

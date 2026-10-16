@@ -10,6 +10,46 @@ way every time, with no manual editing.
 python -m tutorial_editor make raw_footage.mp4 --notes popcorn_chicken_notes.md
 ```
 
+## The website and phone app
+
+Everything below also runs as a website your team signs into, and it installs on phones and
+tablets like an app (Add to Home Screen on iPhone; Install app on Android/Chrome).
+
+| Page | What people do there |
+|---|---|
+| **Videos** | Library of every training video with its status |
+| **New** | Upload raw footage and recipe notes (or an SOP PDF), choose languages and voice, fill in the card details, press *Make the video*. Live progress shows each stage and the director's score |
+| **Video page** | Watch each language, download the video, subtitles and SOP card. Change the card details instantly, ask for a change in plain words, or re-render with the brand voice |
+| **Cards** | Upload any SOP card PDF (made by Studio or not), say what to change, get the updated card in every language |
+| **Brand** (admins) | Upload a new guideline, an approved example video or an approved card; replace the logo or mascot; set the voice and card defaults |
+| **Team** (admins) | Add or remove people; editor vs admin roles |
+
+**Run it on one computer**
+
+```bash
+pip install -r requirements.txt
+export ANTHROPIC_API_KEY=... ELEVENLABS_API_KEY=...
+uvicorn webapp.server:app --host 0.0.0.0 --port 8000
+```
+
+Open http://localhost:8000. The first visit creates the admin account; then upload the brand
+guideline and sample video on the **Brand** page to build the logo and mascot.
+
+**Host it for the whole team**
+
+The repo includes a `Dockerfile` with ffmpeg, Chromium and the PDF tools built in.
+
+```bash
+cp .env.example .env        # add the API keys
+docker compose up -d        # http://<server>:8000
+```
+
+- **Where:** any host that runs a Docker container with a persistent disk: Render, Railway,
+  Fly.io, DigitalOcean, AWS Lightsail or a small office server.
+- **Size:** about 4 CPU cores, 8 GB RAM and 50+ GB of disk for videos. No GPU needed.
+- **HTTPS:** put it behind HTTPS (most hosts do this for you) and set `STUDIO_SECURE_COOKIES=1`.
+- **Backups:** everything (videos, cards, brand kit, accounts) lives in the `data/` volume.
+
 ## What it does
 
 1. **Watches the footage.** Samples frames across the whole clip (and transcribes any speech
